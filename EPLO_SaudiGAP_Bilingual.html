@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html id="html-root" lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPLO — Saudi GAP Compliance System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Tajawal:wght@400;500;700&family=Space+Grotesk:wght@400;500;600&display=swap');
+:root{--teal:#0F6E56;--teal2:#1D9E75;--teal3:#5DCAA5;--teal-bg:#04342C;--teal-lt:#E1F5EE;--amber:#BA7517;--amber-lt:#FAEEDA;--red:#993C1D;--red-lt:#FAECE7;--green:#27500A;--green-lt:#EAF3DE;--gray:#5F5E5A;--gray2:#888780;--gray-lt:#F1EFE8;--border:#D3D1C7;--surface:#ffffff;--surface2:#f8f7f4;--text:#2C2C2A;--text2:#5F5E5A;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Tajawal',sans-serif;background:var(--surface2);color:var(--text);min-height:100vh;font-size:14px;}
+[lang="en"] body,[lang="en"] .tab-btn,[lang="en"] h2,[lang="en"] h3,[lang="en"] label,[lang="en"] .score-label,[lang="en"] .reg-label{font-family:'Space Grotesk',sans-serif;}
+.header{background:var(--teal-bg);padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(93,202,165,.15);}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--teal2),var(--teal3));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:#fff;}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;color:#fff;letter-spacing:.5px;}
+.logo-sub{font-size:10px;color:var(--teal3);font-weight:400;display:block;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.farm-badge{background:rgba(29,158,117,.15);border:1px solid rgba(29,158,117,.3);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--teal3);font-family:'Space Grotesk',sans-serif;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--teal2);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.date-txt{font-size:11px;color:var(--teal3);font-family:'IBM Plex Mono',monospace;}
+.lang-toggle{display:flex;border:1px solid rgba(93,202,165,.3);border-radius:20px;overflow:hidden;}
+.lang-btn{padding:4px 12px;border:none;background:none;cursor:pointer;font-size:12px;font-weight:600;font-family:'Space Grotesk',sans-serif;color:rgba(255,255,255,.5);transition:all .15s;}
+.lang-btn.active{background:rgba(29,158,117,.3);color:var(--teal3);}
+.export-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--teal);border-radius:8px;background:none;cursor:pointer;font-size:12px;color:var(--teal3);transition:all .15s;white-space:nowrap;}
+.export-btn:hover{background:rgba(29,158,117,.1);}
+.score-bar{background:var(--teal-bg);border-bottom:1px solid rgba(93,202,165,.1);padding:12px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+.score-item{display:flex;align-items:center;gap:10px;}
+.score-circle{width:52px;height:52px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid;}
+.score-num{font-size:16px;font-weight:700;line-height:1;font-family:'IBM Plex Mono',monospace;}
+.score-pct{font-size:9px;opacity:.7;}
+.score-label{font-size:11px;color:var(--teal3);font-weight:500;}
+.score-val{font-size:13px;color:#fff;font-weight:600;}
+.score-sep{width:1px;height:36px;background:rgba(255,255,255,.1);margin:0 4px;}
+.overall-score{margin-right:auto;}
+[dir="ltr"] .overall-score{margin-right:0;margin-left:auto;}
+.compliance-pct{font-size:28px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:#fff;}
+.compliance-sub{font-size:11px;color:var(--teal3);}
+.tabs{background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;display:flex;gap:0;position:sticky;top:56px;z-index:90;overflow-x:auto;}
+.tab-btn{padding:14px 18px;border:none;background:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap;}
+.tab-btn:hover{color:var(--teal);}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);}
+.tab-count{font-size:10px;padding:1px 6px;border-radius:10px;font-family:'IBM Plex Mono',monospace;}
+.main{padding:20px 24px;max-width:1200px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.section-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.section-hdr h2{font-size:15px;font-weight:700;color:var(--text);}
+.section-tag{font-size:10px;padding:2px 8px;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-weight:500;}
+.sensor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px;}
+.sensor-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:box-shadow .15s;}
+.sensor-card:hover{box-shadow:0 2px 12px rgba(15,110,86,.1);}
+.sensor-card::before{content:'';position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 12px 12px 0;}
+[dir="ltr"] .sensor-card::before{right:auto;left:0;border-radius:12px 0 0 12px;}
+.sensor-card.ok::before{background:var(--teal2);}
+.sensor-card.warn::before{background:var(--amber);}
+.sensor-card.alert::before{background:var(--red);}
+.sensor-code{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray2);margin-bottom:4px;}
+.sensor-name{font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:500;}
+.sensor-value{font-size:26px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1;}
+.sensor-unit{font-size:12px;color:var(--gray2);margin-right:2px;}
+.sensor-limit{font-size:10px;color:var(--gray2);margin-top:4px;}
+.sensor-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;margin-top:6px;padding:2px 8px;border-radius:10px;}
+.status-ok{background:var(--green-lt);color:var(--green);}
+.status-warn{background:var(--amber-lt);color:var(--amber);}
+.status-alert{background:var(--red-lt);color:var(--red);}
+.sensor-ref{position:absolute;top:12px;left:12px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--teal);background:var(--teal-lt);padding:1px 5px;border-radius:4px;}
+[dir="rtl"] .sensor-ref{left:auto;right:12px;}
+.comp-table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin-bottom:20px;}
+.comp-table th{background:var(--teal-bg);color:#fff;padding:10px 14px;text-align:right;font-size:11px;font-weight:600;font-family:'Space Grotesk',sans-serif;letter-spacing:.3px;}
+[dir="ltr"] .comp-table th{text-align:left;}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--gray-lt);font-size:12px;vertical-align:top;}
+.comp-table tr:last-child td{border-bottom:none;}
+.comp-table tr:nth-child(even) td{background:#fafaf8;}
+.comp-table tr:hover td{background:var(--teal-lt);}
+.code-pill{font-family:'IBM Plex Mono',monospace;font-size:10px;background:var(--gray-lt);border:1px solid var(--border);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.spark{display:flex;align-items:flex-end;gap:2px;height:24px;}
+.spark-bar{flex:1;border-radius:2px 2px 0 0;min-width:3px;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-bottom:20px;}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.form-card-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.form-card-hdr h3{font-size:13px;font-weight:600;flex:1;}
+.form-card-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.field-row{display:flex;flex-direction:column;gap:4px;}
+.field-row label{font-size:11px;color:var(--text2);font-weight:500;}
+.field-row input,.field-row select,.field-row textarea{border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-family:'Tajawal',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s;width:100%;text-align:right;}
+[dir="ltr"] .field-row input,[dir="ltr"] .field-row select,[dir="ltr"] .field-row textarea{text-align:left;font-family:'Space Grotesk',sans-serif;}
+.field-row input:focus,.field-row select:focus,.field-row textarea:focus{border-color:var(--teal2);box-shadow:0 0 0 3px rgba(29,158,117,.1);}
+.field-row textarea{resize:vertical;min-height:60px;}
+.save-btn{width:100%;padding:9px;background:var(--teal);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:600;transition:background .15s;margin-top:4px;}
+[dir="ltr"] .save-btn{font-family:'Space Grotesk',sans-serif;}
+.save-btn:hover{background:var(--teal2);}
+.saved-indicator{display:none;align-items:center;gap:6px;font-size:11px;color:var(--teal2);margin-top:6px;}
+.saved-indicator.show{display:flex;}
+.reg-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.reg-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
+.reg-num{font-size:32px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1;}
+.reg-label{font-size:11px;color:var(--text2);margin-top:4px;}
+.reg-bar-wrap{height:6px;background:var(--gray-lt);border-radius:3px;margin-top:8px;overflow:hidden;}
+.reg-bar{height:6px;border-radius:3px;transition:width .8s;}
+.reg-timeline{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+.reg-timeline-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.reg-timeline-hdr h3{font-size:13px;font-weight:600;}
+.event-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--gray-lt);font-size:12px;}
+.event-row:last-child{border-bottom:none;}
+.event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.event-time{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray2);min-width:45px;}
+.event-text{flex:1;color:var(--text);}
+.event-code{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--teal);background:var(--teal-lt);padding:1px 5px;border-radius:3px;}
+.risk-section{display:grid;grid-template-columns:240px 1fr;gap:14px;margin-bottom:20px;}
+.risk-gauge-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;}
+.risk-num-big{font-size:56px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1;}
+.risk-label-big{font-size:12px;color:var(--text2);margin-top:4px;}
+.trend-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.trend-card h3{font-size:13px;font-weight:600;margin-bottom:12px;}
+.divider{height:1px;background:var(--border);margin:20px 0;}
+.alert-banner{background:var(--red-lt);border:1px solid var(--red);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--red);margin-bottom:14px;}
+.ok-banner{background:var(--green-lt);border:1px solid var(--teal2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--teal);margin-bottom:14px;}
+@media(max-width:700px){.sensor-grid{grid-template-columns:1fr 1fr;}.reg-summary{grid-template-columns:1fr 1fr;}.risk-section{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}.score-bar{display:none;}}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">
+    <div class="logo-mark">EP</div>
+    <div>
+      <div class="logo-text">EPLO <span style="opacity:.5;font-weight:400">|</span> Saudi GAP</div>
+      <span class="logo-sub" id="logo-sub">Biosecurity Compliance System</span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <span class="date-txt" id="live-time"></span>
+    <div class="farm-badge" id="farm-badge"></div>
+    <div class="lang-toggle">
+      <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">AR</button>
+      <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="export-btn" onclick="window.print()" id="btn-export">⬇ Export PDF</button>
+  </div>
+</header>
+
+<div class="score-bar">
+  <div class="overall-score">
+    <div>
+      <div class="compliance-pct" id="overall-pct">—%</div>
+      <div class="compliance-sub" id="overall-sub"></div>
+    </div>
+  </div>
+  <div class="score-sep"></div>
+  <div class="score-item">
+    <div class="score-circle" style="border-color:var(--teal2)">
+      <span class="score-num" style="color:var(--teal2)" id="sc-auto">—</span>
+      <span class="score-pct" style="color:var(--teal3)" id="sc-auto-lbl"></span>
+    </div>
+    <div class="score-info">
+      <div class="score-label" id="sc-auto-title"></div>
+      <div class="score-val" id="sc-auto-v">— / 12</div>
+    </div>
+  </div>
+  <div class="score-sep"></div>
+  <div class="score-item">
+    <div class="score-circle" style="border-color:var(--amber)">
+      <span class="score-num" style="color:var(--amber)" id="sc-part">—</span>
+      <span class="score-pct" style="color:var(--amber)" id="sc-part-lbl"></span>
+    </div>
+    <div class="score-info">
+      <div class="score-label" id="sc-part-title"></div>
+      <div class="score-val" id="sc-part-v">— / 9</div>
+    </div>
+  </div>
+  <div class="score-sep"></div>
+  <div class="score-item">
+    <div class="score-circle" style="border-color:var(--gray2)">
+      <span class="score-num" style="color:var(--gray2)" id="sc-man">—</span>
+      <span class="score-pct" style="color:var(--gray2)" id="sc-man-lbl"></span>
+    </div>
+    <div class="score-info">
+      <div class="score-label" id="sc-man-title"></div>
+      <div class="score-val" id="sc-man-v">— / 14</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-btn-auto" onclick="switchTab('auto',this)">
+    🟢 <span id="tab-lbl-auto"></span>
+    <span class="tab-count" style="background:var(--green-lt);color:var(--green)">12</span>
+  </button>
+  <button class="tab-btn" id="tab-btn-manual" onclick="switchTab('manual',this)">
+    ✏️ <span id="tab-lbl-manual"></span>
+    <span class="tab-count" style="background:var(--amber-lt);color:var(--amber)">23</span>
+  </button>
+  <button class="tab-btn" id="tab-btn-reg" onclick="switchTab('reg',this)">
+    📋 <span id="tab-lbl-reg"></span>
+    <span class="tab-count" style="background:var(--teal-lt);color:var(--teal)" id="tab-lbl-reg-count"></span>
+  </button>
+</div>
+
+<div class="main">
+
+<div id="tab-auto" class="tab-panel active">
+  <div id="alert-zone"></div>
+  <div class="risk-section">
+    <div class="risk-gauge-card">
+      <div class="risk-num-big" id="risk-big" style="color:var(--amber)">—</div>
+      <div style="height:6px;background:var(--gray-lt);border-radius:3px;margin:10px 0;overflow:hidden">
+        <div id="risk-bar-fill" style="height:6px;border-radius:3px;transition:width .8s;width:0%"></div>
+      </div>
+      <div class="risk-label-big" id="risk-label"></div>
+      <div style="font-size:10px;color:var(--gray2);margin-top:8px">de Vos &amp; Elbers 2024 — QMRA</div>
+    </div>
+    <div class="trend-card">
+      <h3 id="trend-title"></h3>
+      <canvas id="trend-chart" height="100" style="width:100%"></canvas>
+    </div>
+  </div>
+  <div class="section-hdr">
+    <h2 id="hdr-sensors"></h2>
+    <span class="section-tag" style="background:var(--green-lt);color:var(--green)" id="tag-sensors"></span>
+    <span style="font-size:11px;color:var(--gray2);margin-right:auto;margin-left:auto;font-family:'IBM Plex Mono',monospace" id="last-update">—</span>
+  </div>
+  <div class="sensor-grid" id="sensor-grid"></div>
+  <div class="section-hdr" style="margin-top:8px">
+    <h2 id="hdr-comp-log"></h2>
+    <span class="section-tag" style="background:var(--teal-lt);color:var(--teal)" id="tag-live"></span>
+  </div>
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th id="th-code"></th><th id="th-req"></th>
+        <th id="th-limit"></th><th id="th-reading"></th><th id="th-status"></th>
+      </tr>
+    </thead>
+    <tbody id="auto-table-body"></tbody>
+  </table>
+</div>
+
+<div id="tab-manual" class="tab-panel">
+  <div class="ok-banner"><span>✅</span><span id="manual-banner"></span></div>
+  <div class="section-hdr">
+    <h2 id="hdr-partial"></h2>
+    <span class="section-tag" style="background:var(--amber-lt);color:var(--amber)" id="tag-partial"></span>
+  </div>
+  <div class="form-grid" id="partial-forms"></div>
+  <div class="divider"></div>
+  <div class="section-hdr">
+    <h2 id="hdr-manual-req"></h2>
+    <span class="section-tag" style="background:var(--gray-lt);color:var(--gray)" id="tag-manual-req"></span>
+  </div>
+  <div class="form-grid" id="manual-forms"></div>
+</div>
+
+<div id="tab-reg" class="tab-panel">
+  <div class="reg-summary">
+    <div class="reg-card">
+      <div class="reg-num" style="color:var(--teal2)" id="reg-total">—</div>
+      <div class="reg-label" id="reg-lbl-total"></div>
+      <div class="reg-bar-wrap"><div class="reg-bar" id="reg-bar-total" style="background:var(--teal2)"></div></div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-num" style="color:var(--green)" id="reg-auto">12</div>
+      <div class="reg-label" id="reg-lbl-auto"></div>
+      <div class="reg-bar-wrap"><div class="reg-bar" id="reg-bar-auto" style="background:var(--teal2)"></div></div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-num" style="color:var(--amber)" id="reg-part">—</div>
+      <div class="reg-label" id="reg-lbl-part"></div>
+      <div class="reg-bar-wrap"><div class="reg-bar" id="reg-bar-part" style="background:var(--amber)"></div></div>
+    </div>
+    <div class="reg-card">
+      <div class="reg-num" style="color:var(--red)" id="reg-missing">—</div>
+      <div class="reg-label" id="reg-lbl-miss"></div>
+      <div class="reg-bar-wrap"><div class="reg-bar" id="reg-bar-miss" style="background:var(--red)"></div></div>
+    </div>
+  </div>
+  <div class="reg-timeline">
+    <div class="reg-timeline-hdr">
+      <h3 id="reg-events-title"></h3>
+      <span style="font-size:11px;color:var(--gray2)" id="reg-auto-update"></span>
+    </div>
+    <div id="event-list"></div>
+  </div>
+  <div class="section-hdr"><h2 id="reg-full-title"></h2></div>
+  <table class="comp-table">
+    <thead>
+      <tr>
+        <th id="rth-code"></th><th id="rth-req"></th>
+        <th id="rth-type"></th><th id="rth-val"></th>
+        <th id="rth-updated"></th><th id="rth-status"></th>
+      </tr>
+    </thead>
+    <tbody id="reg-full-table"></tbody>
+  </table>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════
+//  TRANSLATIONS
+// ═══════════════════════════════════════════
+const T = {
+  ar: {
+    logoSub:'نظام مراقبة الأمن الحيوي',
+    farmBadge:'مزرعة الزهراني — F-03 — جدة',
+    exportBtn:'⬇ تصدير PDF',
+    overallSub:'نسبة الامتثال الكلية — Saudi GAP 2021',
+    scAutoLbl:'أوتو', scAutoTitle:'أتمتة كاملة',
+    scPartLbl:'جزئي', scPartTitle:'أتمتة جزئية',
+    scManLbl:'يدوي',  scManTitle:'إدخال يدوي',
+    tabAuto:'مؤتمت بالكامل', tabManual:'إدخال يدوي',
+    tabReg:'عرض رقابي',      tabRegCount:'شامل',
+    riskLabel:'درجة الخطر QMRA',
+    trendTitle:'الترند — آخر ٢٤ ساعة',
+    hdrSensors:'مقاييس بيئية لحظية',
+    tagSensors:'PF.5.3 — أتمتة ١٠٠٪',
+    hdrCompLog:'سجل الامتثال التلقائي',
+    tagLive:'تحديث فوري',
+    thCode:'كود Saudi GAP', thReq:'المتطلب',
+    thLimit:'الحد المسموح', thReading:'القراءة الحالية', thStatus:'الحالة',
+    manualBanner:'كل الحقول تُحفظ تلقائياً وتُضاف لسجل الامتثال — الجهات الرقابية ترى هذه البيانات في تبويب "العرض الرقابي"',
+    hdrPartial:'أتمتة جزئية — إدخال دوري',
+    tagPartial:'٩ متطلبات',
+    hdrManualReq:'متطلبات يدوية — توثيق إلزامي',
+    tagManualReq:'١٤ متطلباً',
+    regLblTotal:'إجمالي النقاط المكتملة',
+    regLblAuto:'مؤتمتة — بيانات حساسات',
+    regLblPart:'جزئية — إدخال يدوي',
+    regLblMiss:'غير مكتملة',
+    regEventsTitle:'سجل الأحداث — آخر ٢٤ ساعة',
+    regAutoUpdate:'يُحدَّث تلقائياً',
+    regFullTitle:'الجدول الشامل — جميع المتطلبات',
+    rthCode:'الكود', rthReq:'المتطلب', rthType:'النوع',
+    rthVal:'القيمة / الحالة', rthUpdated:'آخر تحديث', rthStatus:'الامتثال',
+    stOk:'مطابق', stWarn:'تنبيه', stAlert:'مخالفة!',
+    stCompliant:'مطابق', stViolation:'مخالفة', stNormal:'طبيعي',
+    typeAuto:'أوتو', typePart:'جزئي', typeManual:'يدوي',
+    valEntered:'مُدخَل', valPending:'لم يُدخَل بعد',
+    regCompliant:'✓ مطابق', regPartial:'⚠ إدخال جزئي',
+    regViolation:'✗ مخالفة', regIncomplete:'— غير مكتمل',
+    saveBtn:'حفظ وتسجيل', saveDone:'✓ تم الحفظ',
+    savedMsg:'تم الحفظ في سجل الامتثال',
+    sysStart:'النظام بدأ التشغيل',
+    allOk:'جميع المقاييس البيئية ضمن حدود Saudi GAP',
+    alertPrefix:'تنبيه:',
+    alertSuffix:'خارج النطاق',
+    lastUpdate:'آخر تحديث:',
+    eventUpdated:'تم تحديث',
+    limitLabel:'الحد:',
+    noEvents:'لا أحداث بعد',
+    riskHigh:'خطر مرتفع — فحص فوري مطلوب',
+    riskMed:'خطر متوسط — مراقبة مكثفة',
+    riskLow:'خطر منخفض — وضع طبيعي',
+  },
+  en: {
+    logoSub:'Biosecurity Compliance System',
+    farmBadge:'Al-Zahrani Farm — F-03 — Jeddah',
+    exportBtn:'⬇ Export PDF',
+    overallSub:'Overall Compliance Score — Saudi GAP 2021',
+    scAutoLbl:'Auto', scAutoTitle:'Full Automation',
+    scPartLbl:'Part', scPartTitle:'Partial Automation',
+    scManLbl:'Man',   scManTitle:'Manual Entry',
+    tabAuto:'Automated', tabManual:'Manual Input',
+    tabReg:'Regulatory View', tabRegCount:'Full',
+    riskLabel:'QMRA Risk Score',
+    trendTitle:'24-Hour Trend',
+    hdrSensors:'Live Environmental Readings',
+    tagSensors:'PF.5.3 — 100% Automated',
+    hdrCompLog:'Automated Compliance Log',
+    tagLive:'Real-time',
+    thCode:'Saudi GAP Code', thReq:'Requirement',
+    thLimit:'Limit', thReading:'Current Reading', thStatus:'Status',
+    manualBanner:'All fields are auto-saved and added to the compliance record — Regulatory bodies can view this data in the "Regulatory View" tab',
+    hdrPartial:'Partial Automation — Periodic Entry',
+    tagPartial:'9 Requirements',
+    hdrManualReq:'Manual Requirements — Mandatory Documentation',
+    tagManualReq:'14 Requirements',
+    regLblTotal:'Total Completed Points',
+    regLblAuto:'Automated — Sensor Data',
+    regLblPart:'Partial — Manual Entry',
+    regLblMiss:'Incomplete',
+    regEventsTitle:'Event Log — Last 24 Hours',
+    regAutoUpdate:'Auto-updated',
+    regFullTitle:'Full Compliance Table — All Requirements',
+    rthCode:'Code', rthReq:'Requirement', rthType:'Type',
+    rthVal:'Value / Status', rthUpdated:'Last Updated', rthStatus:'Compliance',
+    stOk:'OK', stWarn:'Warning', stAlert:'Violation!',
+    stCompliant:'Compliant', stViolation:'VIOLATION', stNormal:'Normal',
+    typeAuto:'Auto', typePart:'Partial', typeManual:'Manual',
+    valEntered:'Entered', valPending:'Not entered yet',
+    regCompliant:'✓ Compliant', regPartial:'⚠ Partial Entry',
+    regViolation:'✗ Violation', regIncomplete:'— Incomplete',
+    saveBtn:'Save & Record', saveDone:'✓ Saved',
+    savedMsg:'Saved to compliance record',
+    sysStart:'System started',
+    allOk:'All environmental readings within Saudi GAP limits',
+    alertPrefix:'Alert:',
+    alertSuffix:'out of range',
+    lastUpdate:'Last update:',
+    eventUpdated:'Updated',
+    limitLabel:'Limit:',
+    noEvents:'No events yet',
+    riskHigh:'High Risk — Immediate inspection required',
+    riskMed:'Moderate Risk — Monitor closely',
+    riskLow:'Low Risk — Normal operations',
+  }
+};
+
+// ═══════════════════════════════════════════
+//  SENSOR & FORM DEFINITIONS (bilingual)
+// ═══════════════════════════════════════════
+const SENSORS = [
+  {id:'temp',    code:'PF.5.3.2', nameAr:'درجة الحرارة',       nameEn:'Temperature',         unit:'°C',    limitTxt:'30–38', limitVal:38,limitMin:30,base:35.5,sigma:2.2,color:'#D85A30'},
+  {id:'humidity',code:'PF.5.3.3', nameAr:'الرطوبة النسبية',    nameEn:'Relative Humidity',   unit:'%',     limitTxt:'50–70', limitVal:70,limitMin:50,base:65,  sigma:6,  color:'#378ADD'},
+  {id:'pm25',    code:'PF.5.3.4', nameAr:'هباء PM2.5',         nameEn:'PM2.5 Aerosol',       unit:'µg/m³', limitTxt:'< 150', limitVal:150,limitMin:0,base:105,sigma:32, color:'#888780'},
+  {id:'ammonia', code:'PF.5.3.4', nameAr:'أمونيا NH₃',         nameEn:'Ammonia NH₃',         unit:'ppm',   limitTxt:'< 20',  limitVal:20, limitMin:0,base:13.5,sigma:3, color:'#BA7517'},
+  {id:'co2',     code:'PF.5.3.4', nameAr:'ثاني أكسيد الكربون', nameEn:'Carbon Dioxide CO₂',  unit:'ppm',   limitTxt:'< 3000',limitVal:3000,limitMin:0,base:1750,sigma:300,color:'#534AB7'},
+  {id:'airflow', code:'PF.5.3.3', nameAr:'تدفق الهواء',        nameEn:'Air Flow Rate',       unit:'m³/hr', limitTxt:'≥ 10',  limitVal:999,limitMin:10,base:14, sigma:2, color:'#1D9E75'},
+  {id:'temp_out',code:'PF.5.3.6', nameAr:'الحرارة الخارجية',   nameEn:'Outdoor Temperature', unit:'°C',    limitTxt:'—',     limitVal:999,limitMin:0, base:38, sigma:3, color:'#EF9F27'},
+  {id:'floor_t', code:'PF.3.5.1', nameAr:'حرارة الأرضية',      nameEn:'Floor Temperature',   unit:'°C',    limitTxt:'30–33', limitVal:33, limitMin:30,base:31.5,sigma:1.2,color:'#D85A30'},
+];
+
+const PARTIAL_FIELDS = [
+  {code:'PF.1.1',  icon:'🐣', titleAr:'سجل دخول القطيع',            titleEn:'Flock Entry Record',
+   fields:[{lAr:'اسم المورد',lEn:'Supplier Name',name:'supplier',type:'text',phEn:'Hatchery name...',phAr:'مفرخة...'},
+           {lAr:'تاريخ الاستلام',lEn:'Arrival Date',name:'recv_date',type:'date'},
+           {lAr:'سلالة الآباء',lEn:'Parent Breed',name:'breed',type:'text',phEn:'Ross 308...',phAr:'Ross 308...'},
+           {lAr:'عدد الكتاكيت',lEn:'Chick Count',name:'count',type:'number',phEn:'0',phAr:'0'}]},
+  {code:'PF.2.8',  icon:'🥚', titleAr:'سجل جمع البيض اليومي',       titleEn:'Daily Egg Collection Record',
+   fields:[{lAr:'عدد البيض المجموع',lEn:'Total Eggs Collected',name:'eggs_total',type:'number'},
+           {lAr:'بيض أرضي',lEn:'Floor Eggs',name:'eggs_floor',type:'number'},
+           {lAr:'بيض مرفوض',lEn:'Rejected Eggs',name:'eggs_reject',type:'number'},
+           {lAr:'وقت الجمع',lEn:'Collection Time',name:'collect_time',type:'time'}]},
+  {code:'PF.2.9',  icon:'🧪', titleAr:'مراقبة السالمونيلا/ميكوبلازما',titleEn:'Salmonella / Mycoplasma Monitoring',
+   fields:[{lAr:'تاريخ الاختبار',lEn:'Test Date',name:'test_date',type:'date'},
+           {lAr:'المختبر المنفذ',lEn:'Testing Lab',name:'lab_name',type:'text'},
+           {lAr:'نتيجة السالمونيلا',lEn:'Salmonella Result',name:'salmonella',type:'select',
+            optsAr:['سالب (OK)','موجب — اتخاذ إجراء'],optsEn:['Negative (OK)','Positive — Action Required']},
+           {lAr:'نتيجة الميكوبلازما',lEn:'Mycoplasma Result',name:'mycoplasma',type:'select',
+            optsAr:['سالب (OK)','موجب — اتخاذ إجراء'],optsEn:['Negative (OK)','Positive — Action Required']}]},
+  {code:'PF.3.1.12',icon:'🔔',titleAr:'سجل إنذارات الحضانة',       titleEn:'Hatchery Alarm Log',
+   fields:[{lAr:'نوع الإنذار',lEn:'Alarm Type',name:'alarm_type',type:'select',
+            optsAr:['درجة حرارة عالية','درجة حرارة منخفضة','فشل تهوية','انقطاع كهرباء'],
+            optsEn:['High Temperature','Low Temperature','Ventilation Failure','Power Outage']},
+           {lAr:'وقت الإنذار',lEn:'Alarm Time',name:'alarm_time',type:'datetime-local'},
+           {lAr:'وقت الاستجابة (دقيقة)',lEn:'Response Time (min)',name:'response_min',type:'number',phEn:'< 15',phAr:'< 15'},
+           {lAr:'الإجراء المتخذ',lEn:'Action Taken',name:'action_taken',type:'text'}]},
+  {code:'PF.3.1.16',icon:'💧',titleAr:'سجل التبخير والتعقيم',      titleEn:'Fumigation & Disinfection Log',
+   fields:[{lAr:'تاريخ التبخير',lEn:'Fumigation Date',name:'fum_date',type:'date'},
+           {lAr:'المادة المستخدمة',lEn:'Chemical Used',name:'chemical',type:'text'},
+           {lAr:'المنطقة المعقمة',lEn:'Area Disinfected',name:'area',type:'text'},
+           {lAr:'المنفذ',lEn:'Operator',name:'operator',type:'text'}]},
+  {code:'PF.4.4',  icon:'🌾',titleAr:'جدول تنظيف صوامع العلف',    titleEn:'Feed Silo Cleaning Schedule',
+   fields:[{lAr:'تاريخ التنظيف',lEn:'Cleaning Date',name:'silo_date',type:'date'},
+           {lAr:'رقم الصومعة',lEn:'Silo Number',name:'silo_id',type:'text'},
+           {lAr:'نوع التنظيف',lEn:'Cleaning Type',name:'clean_type',type:'select',
+            optsAr:['روتيني','طوارئ','دوري'],optsEn:['Routine','Emergency','Periodic']},
+           {lAr:'ملاحظات',lEn:'Notes',name:'silo_notes',type:'textarea'}]},
+  {code:'PF.5.3.8',icon:'🌡️',titleAr:'خطة طوارئ الحر / البرد',    titleEn:'Heat / Cold Emergency Protocol',
+   fields:[{lAr:'نوع الطارئ',lEn:'Emergency Type',name:'emerg_type',type:'select',
+            optsAr:['إجهاد حراري','برودة شديدة','انقطاع تبريد'],
+            optsEn:['Heat Stress','Severe Cold','Cooling Failure']},
+           {lAr:'تاريخ التفعيل',lEn:'Activation Date',name:'emerg_date',type:'date'},
+           {lAr:'الإجراء المتخذ',lEn:'Action Taken',name:'emerg_action',type:'textarea',
+            phAr:'خفض الكثافة، زيادة التهوية...',phEn:'Reduce density, increase ventilation...'}]},
+  {code:'PF.6.2',  icon:'🩺',titleAr:'الخطة البيطرية السنوية',     titleEn:'Annual Veterinary Health Plan',
+   fields:[{lAr:'اسم البيطري',lEn:'Veterinarian Name',name:'vet_name',type:'text'},
+           {lAr:'تاريخ الزيارة',lEn:'Visit Date',name:'vet_date',type:'date'},
+           {lAr:'ملخص الزيارة',lEn:'Visit Summary',name:'vet_summary',type:'textarea',
+            phAr:'حالة القطيع، التوصيات...',phEn:'Flock condition, recommendations...'},
+           {lAr:'موعد الزيارة القادمة',lEn:'Next Visit Date',name:'vet_next',type:'date'}]},
+  {code:'PF.8.2.4',icon:'🔬',titleAr:'طلب تشريح الطيور المشبوهة',  titleEn:'Suspected Bird Autopsy Request',
+   fields:[{lAr:'تاريخ الإرسال',lEn:'Submission Date',name:'autopsy_date',type:'date'},
+           {lAr:'عدد الطيور المرسلة',lEn:'Birds Submitted',name:'autopsy_count',type:'number'},
+           {lAr:'المختبر المستقبِل',lEn:'Receiving Lab',name:'autopsy_lab',type:'text'},
+           {lAr:'النتيجة / الملاحظة',lEn:'Result / Notes',name:'autopsy_result',type:'textarea'}]},
+];
+
+const MANUAL_FIELDS = [
+  {code:'PF.2.1', icon:'🚫',titleAr:'الإمراض القسري',           titleEn:'Forced Molting',
+   fields:[{lAr:'هل يطبق الإمراض القسري؟',lEn:'Is forced molting applied?',name:'forced_molt',type:'select',
+            optsAr:['لا — مطابق','نعم — مخالفة'],optsEn:['No — Compliant','Yes — Violation']},
+           {lAr:'ملاحظة',lEn:'Note',name:'molt_note',type:'text'}]},
+  {code:'PF.2.2', icon:'🧴',titleAr:'تعقيم يدي العمال',         titleEn:'Worker Hand Hygiene',
+   fields:[{lAr:'الالتزام اليومي',lEn:'Daily Compliance',name:'hand_hygiene',type:'select',
+            optsAr:['ملتزم','غير ملتزم'],optsEn:['Compliant','Non-compliant']},
+           {lAr:'ملاحظة المشرف',lEn:'Supervisor Note',name:'hygiene_note',type:'text'}]},
+  {code:'PF.2.3', icon:'🥚',titleAr:'فرز البيض المكسور',        titleEn:'Cracked Egg Sorting',
+   fields:[{lAr:'حالة الفرز اليوم',lEn:'Today\'s Sorting Status',name:'egg_sort',type:'select',
+            optsAr:['مكتمل','جزئي','لم يتم'],optsEn:['Complete','Partial','Not done']},
+           {lAr:'عدد البيض المرفوض',lEn:'Rejected Egg Count',name:'rejected_eggs',type:'number'}]},
+  {code:'PF.3.1.2',icon:'🧹',titleAr:'نظافة المفرخة',           titleEn:'Hatchery Cleanliness',
+   fields:[{lAr:'حالة النظافة',lEn:'Cleanliness Status',name:'hatch_clean',type:'select',
+            optsAr:['نظيف — مطابق','يحتاج تنظيف','غير مقبول'],optsEn:['Clean — Compliant','Needs cleaning','Unacceptable']},
+           {lAr:'تاريخ آخر تنظيف',lEn:'Last Cleaning Date',name:'hatch_clean_date',type:'date'}]},
+  {code:'PF.3.1.3',icon:'👷',titleAr:'ملابس العمال الواقية',    titleEn:'Worker PPE Compliance',
+   fields:[{lAr:'الالتزام بالملابس',lEn:'PPE Compliance',name:'ppe',type:'select',
+            optsAr:['ملتزمون جميعاً','التزام جزئي','لا التزام'],optsEn:['All compliant','Partial compliance','Non-compliant']},
+           {lAr:'ملاحظة',lEn:'Note',name:'ppe_note',type:'text'}]},
+  {code:'PF.3.1.15',icon:'🚪',titleAr:'تغيير الملابس بين المناطق',titleEn:'Zone Change Protocol',
+   fields:[{lAr:'الالتزام',lEn:'Compliance',name:'zone_change',type:'select',
+            optsAr:['ملتزم','غير ملتزم'],optsEn:['Compliant','Non-compliant']},
+           {lAr:'هل توجد غرف تغيير؟',lEn:'Change rooms available?',name:'change_room',type:'select',
+            optsAr:['نعم','لا'],optsEn:['Yes','No']}]},
+  {code:'PF.3.5.2',icon:'👶',titleAr:'عامل جمع الكتاكيت المرفوضة',titleEn:'Reject Chick Collection Worker',
+   fields:[{lAr:'اسم العامل المختص',lEn:'Designated Worker',name:'reject_worker',type:'text'},
+           {lAr:'هل مدرب؟',lEn:'Trained?',name:'worker_trained',type:'select',
+            optsAr:['نعم — شهادة','لا'],optsEn:['Yes — Certified','No']}]},
+  {code:'PF.4.1', icon:'📋',titleAr:'تسمية العلف وتفاصيله',     titleEn:'Feed Labelling Details',
+   fields:[{lAr:'اسم المورد',lEn:'Supplier',name:'feed_supplier',type:'text'},
+           {lAr:'تاريخ الإنتاج',lEn:'Production Date',name:'feed_prod',type:'date'},
+           {lAr:'رقم الدفعة',lEn:'Batch Number',name:'feed_batch',type:'text'},
+           {lAr:'نسبة البروتين %',lEn:'Protein %',name:'feed_protein',type:'number'}]},
+  {code:'PF.4.2', icon:'🌡️',titleAr:'معالجة العلف من السالمونيلا',titleEn:'Feed Salmonella Treatment',
+   fields:[{lAr:'نوع المعالجة',lEn:'Treatment Type',name:'feed_treat',type:'select',
+            optsAr:['معالجة حرارية','حمض عضوي','غير محدد'],optsEn:['Heat treatment','Organic acid','Unspecified']},
+           {lAr:'الشهادة / الوثيقة',lEn:'Certificate / Document',name:'feed_cert',type:'text'}]},
+  {code:'PF.5.2', icon:'🐔',titleAr:'كثافة الطيور في الحظيرة',  titleEn:'Bird Stocking Density',
+   fields:[{lAr:'عدد الطيور الحالي',lEn:'Current Bird Count',name:'bird_count',type:'number'},
+           {lAr:'مساحة الحظيرة م²',lEn:'House Area m²',name:'house_area',type:'number'},
+           {lAr:'الكثافة طائر/م²',lEn:'Density birds/m²',name:'density',type:'number'}]},
+  {code:'PF.6.1', icon:'🏥',titleAr:'الزيارات البيطرية الدورية', titleEn:'Routine Veterinary Visits',
+   fields:[{lAr:'تاريخ الزيارة الأخيرة',lEn:'Last Visit Date',name:'last_vet',type:'date'},
+           {lAr:'البيطري المسؤول',lEn:'Responsible Vet',name:'vet_resp',type:'text'},
+           {lAr:'الموعد القادم',lEn:'Next Appointment',name:'next_vet',type:'date'}]},
+  {code:'PF.8.2.2',icon:'📢',titleAr:'الإبلاغ عن الأمراض الوبائية',titleEn:'Reportable Disease Notification',
+   fields:[{lAr:'هل توجد حالة للإبلاغ؟',lEn:'Reportable case?',name:'reportable',type:'select',
+            optsAr:['لا — لا شيء','نعم — تم الإبلاغ','نعم — لم يتم بعد'],
+            optsEn:['No — None','Yes — Reported','Yes — Not yet reported']},
+           {lAr:'الجهة المبلَّغة',lEn:'Notified Authority',name:'report_authority',type:'text'}]},
+  {code:'PF.8.2.3',icon:'🦵',titleAr:'مراقبة العرج في الطيور',   titleEn:'Lameness Monitoring',
+   fields:[{lAr:'نسبة العرج اليوم %',lEn:'Lameness Rate %',name:'lameness_pct',type:'number'},
+           {lAr:'هل تجاوزت الحد 5%؟',lEn:'Exceeded 5% limit?',name:'lameness_exceed',type:'select',
+            optsAr:['لا','نعم — اتخاذ إجراء'],optsEn:['No','Yes — Action required']},
+           {lAr:'ملاحظة البيطري',lEn:'Vet Note',name:'lameness_note',type:'text'}]},
+  {code:'PF.3.2.3',icon:'⚙️',titleAr:'سلامة الكتاكيت من المعدات',titleEn:'Equipment Safety for Chicks',
+   fields:[{lAr:'حالة المعدات',lEn:'Equipment Condition',name:'equip_safe',type:'select',
+            optsAr:['آمنة','تحتاج صيانة','خطر'],optsEn:['Safe','Needs maintenance','Hazardous']},
+           {lAr:'آخر فحص',lEn:'Last Inspection',name:'equip_check',type:'date'}]},
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let lang = 'en';
+let sensorValues = {};
+let manualData = {};
+let eventLog = [];
+let trendData = Array(24).fill(0).map(()=>Math.round(20+Math.random()*50));
+
+// ═══════════════════════════════════════════
+//  LANGUAGE
+// ═══════════════════════════════════════════
+function t(key){ return T[lang][key]||key; }
+function sName(s){ return lang==='ar'? s.nameAr : s.nameEn; }
+function fTitle(f){ return lang==='ar'? f.titleAr : f.titleEn; }
+function fLabel(f){ return lang==='ar'? f.lAr : f.lEn; }
+function fOpts(f){ return lang==='ar'? (f.optsAr||[]) : (f.optsEn||[]); }
+function fPh(f){ return lang==='ar'? (f.phAr||'') : (f.phEn||''); }
+
+function setLang(l){
+  lang = l;
+  const html = document.getElementById('html-root');
+  html.lang = l;
+  html.dir  = l==='ar'?'rtl':'ltr';
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+l).classList.add('active');
+  applyTranslations();
+  renderForms();
+  renderSensors();
+  updateRegView();
+}
+
+function applyTranslations(){
+  const ids = {
+    'logo-sub':'logoSub','farm-badge':'farmBadge','btn-export':'exportBtn',
+    'overall-sub':'overallSub',
+    'sc-auto-lbl':'scAutoLbl','sc-auto-title':'scAutoTitle',
+    'sc-part-lbl':'scPartLbl','sc-part-title':'scPartTitle',
+    'sc-man-lbl':'scManLbl','sc-man-title':'scManTitle',
+    'tab-lbl-auto':'tabAuto','tab-lbl-manual':'tabManual',
+    'tab-lbl-reg':'tabReg','tab-lbl-reg-count':'tabRegCount',
+    'risk-label':'riskLabel','trend-title':'trendTitle',
+    'hdr-sensors':'hdrSensors','tag-sensors':'tagSensors',
+    'hdr-comp-log':'hdrCompLog','tag-live':'tagLive',
+    'th-code':'thCode','th-req':'thReq','th-limit':'thLimit',
+    'th-reading':'thReading','th-status':'thStatus',
+    'manual-banner':'manualBanner',
+    'hdr-partial':'hdrPartial','tag-partial':'tagPartial',
+    'hdr-manual-req':'hdrManualReq','tag-manual-req':'tagManualReq',
+    'reg-lbl-total':'regLblTotal','reg-lbl-auto':'regLblAuto',
+    'reg-lbl-part':'regLblPart','reg-lbl-miss':'regLblMiss',
+    'reg-events-title':'regEventsTitle','reg-auto-update':'regAutoUpdate',
+    'reg-full-title':'regFullTitle',
+    'rth-code':'rthCode','rth-req':'rthReq','rth-type':'rthType',
+    'rth-val':'rthVal','rth-updated':'rthUpdated','rth-status':'rthStatus',
+  };
+  Object.entries(ids).forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = t(key);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  SENSORS
+// ═══════════════════════════════════════════
+function gauss(mu,sigma){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return mu+sigma*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+
+function updateSensors(){
+  SENSORS.forEach(s=>{
+    const prev=sensorValues[s.id]??s.base;
+    sensorValues[s.id]=Math.max(s.limitMin,+(prev*.85+gauss(s.base,s.sigma)*.15).toFixed(1));
+  });
+  renderSensors();
+  updateScores();
+  document.getElementById('last-update').textContent=
+    t('lastUpdate')+' '+new Date().toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB');
+}
+
+function sensorSt(s){
+  const v=sensorValues[s.id]??s.base;
+  if(s.id==='airflow') return v>=s.limitMin?'ok':'alert';
+  if((s.limitMin>0&&v<s.limitMin)||v>s.limitVal) return 'alert';
+  if(v>s.limitVal*.9) return 'warn';
+  return 'ok';
+}
+
+function renderSensors(){
+  const grid=document.getElementById('sensor-grid');
+  grid.innerHTML=SENSORS.map(s=>{
+    const v=sensorValues[s.id]??s.base;
+    const st=sensorSt(s);
+    const stLbl=st==='ok'?t('stOk'):st==='warn'?t('stWarn'):t('stAlert');
+    const spark=trendData.slice(-12).map(x=>
+      `<div class="spark-bar" style="height:${8+Math.round(x/100*16)}px;background:${st==='ok'?'#9FE1CB':st==='warn'?'#FAC775':'#F09595'}"></div>`
+    ).join('');
+    return `<div class="sensor-card ${st}">
+      <span class="sensor-ref">${s.code}</span>
+      <div class="sensor-code">${s.code}</div>
+      <div class="sensor-name">${sName(s)}</div>
+      <div class="sensor-value" style="color:${s.color}">${v}<span class="sensor-unit">${s.unit}</span></div>
+      <div class="sensor-limit">${t('limitLabel')} ${s.limitTxt} ${s.unit}</div>
+      <div class="spark" style="margin-top:8px">${spark}</div>
+      <div class="sensor-status status-${st}"><span>${st==='ok'?'✓':st==='warn'?'⚠':'✗'}</span>${stLbl}</div>
+    </div>`;
+  }).join('');
+
+  // auto table
+  document.getElementById('auto-table-body').innerHTML=SENSORS.map(s=>{
+    const v=sensorValues[s.id]??s.base;
+    const st=sensorSt(s);
+    const badge=st==='ok'
+      ?`<span class="sensor-status status-ok">✓ ${t('stCompliant')}</span>`
+      :st==='warn'
+      ?`<span class="sensor-status status-warn">⚠ ${t('stWarn')}</span>`
+      :`<span class="sensor-status status-alert">✗ ${t('stViolation')}</span>`;
+    return `<tr>
+      <td><span class="code-pill">${s.code}</span></td>
+      <td>${sName(s)}</td>
+      <td>${s.limitTxt} ${s.unit}</td>
+      <td><b style="font-family:'IBM Plex Mono',monospace">${v} ${s.unit}</b></td>
+      <td>${badge}</td></tr>`;
+  }).join('');
+
+  // alerts
+  const alerts=SENSORS.filter(s=>sensorSt(s)==='alert');
+  const az=document.getElementById('alert-zone');
+  if(alerts.length){
+    az.innerHTML=`<div class="alert-banner">⚠ <strong>${t('alertPrefix')}</strong> ${alerts.map(s=>`${sName(s)} ${t('alertSuffix')} (${sensorValues[s.id]} ${s.unit})`).join(' | ')}</div>`;
+  } else {
+    az.innerHTML=`<div class="ok-banner">✅ <span>${t('allOk')}</span></div>`;
+  }
+
+  // risk
+  const risk=Math.min(99,Math.max(1,Math.round(
+    .15*Math.max(0,((sensorValues['temp']??35)-30)/20*100)+
+    .30*Math.max(0,((sensorValues['humidity']??65)-40)/55*100)+
+    .55*Math.max(0,(sensorValues['pm25']??105)/300*100)
+  )));
+  const rc=risk>=70?'#993C1D':risk>=40?'#BA7517':'#0F6E56';
+  document.getElementById('risk-big').textContent=risk;
+  document.getElementById('risk-big').style.color=rc;
+  document.getElementById('risk-bar-fill').style.cssText=`height:6px;border-radius:3px;transition:width .8s;width:${risk}%;background:${rc}`;
+  document.getElementById('risk-label').textContent=t('riskLabel');
+
+  trendData.push(risk);
+  if(trendData.length>24) trendData.shift();
+  drawTrend();
+
+  // events
+  if(alerts.length){
+    const now=new Date();
+    alerts.forEach(s=>{
+      eventLog.unshift({time:now.toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB',{hour:'2-digit',minute:'2-digit'}),
+        text:`${sName(s)} ${t('alertSuffix')} — ${sensorValues[s.id]} ${s.unit}`,code:s.code,color:'#993C1D'});
+    });
+  } else if(Math.random()>.8){
+    eventLog.unshift({time:new Date().toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB',{hour:'2-digit',minute:'2-digit'}),
+      text:t('allOk'),code:'PF.5.3',color:'#1D9E75'});
+  }
+  if(eventLog.length>20) eventLog=eventLog.slice(0,20);
+}
+
+function drawTrend(){
+  const c=document.getElementById('trend-chart');
+  if(!c) return;
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth||400; c.height=100;
+  const w=c.width,h=c.height;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='#0F6E56'; ctx.lineWidth=2;
+  ctx.beginPath();
+  trendData.forEach((v,i)=>{
+    const x=(i/(trendData.length-1))*w, y=h-(v/100)*h*.85-8;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.fillStyle='rgba(15,110,86,.1)';
+  ctx.lineTo(w,h); ctx.lineTo(0,h); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#888780'; ctx.font='10px IBM Plex Mono'; ctx.textAlign='left';
+  [0,6,12,18,23].forEach(i=>{
+    ctx.fillText(`-${24-i}h`,(i/(trendData.length-1))*w,h-2);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  SCORES
+// ═══════════════════════════════════════════
+function updateScores(){
+  const autoOk=SENSORS.filter(s=>sensorSt(s)==='ok').length;
+  const partC=Object.keys(manualData).filter(k=>PARTIAL_FIELDS.find(f=>f.code===k)).length;
+  const manC=Object.keys(manualData).filter(k=>MANUAL_FIELDS.find(f=>f.code===k)).length;
+  const total=autoOk+partC+manC;
+  const pct=Math.round(total/35*100);
+  document.getElementById('sc-auto').textContent=autoOk;
+  document.getElementById('sc-auto-v').textContent=`${autoOk} / 12`;
+  document.getElementById('sc-part').textContent=partC;
+  document.getElementById('sc-part-v').textContent=`${partC} / 9`;
+  document.getElementById('sc-man').textContent=manC;
+  document.getElementById('sc-man-v').textContent=`${manC} / 14`;
+  const pctEl=document.getElementById('overall-pct');
+  pctEl.textContent=pct+'%';
+  pctEl.style.color=pct>=80?'var(--teal3)':pct>=60?'#FAC775':'#F09595';
+  const miss=35-total;
+  document.getElementById('reg-total').textContent=total;
+  document.getElementById('reg-auto').textContent=autoOk;
+  document.getElementById('reg-part').textContent=partC+manC;
+  document.getElementById('reg-missing').textContent=miss;
+  document.getElementById('reg-bar-total').style.width=pct+'%';
+  document.getElementById('reg-bar-auto').style.width=Math.round(autoOk/12*100)+'%';
+  document.getElementById('reg-bar-part').style.width=Math.round((partC+manC)/23*100)+'%';
+  document.getElementById('reg-bar-miss').style.width=Math.round(miss/35*100)+'%';
+}
+
+// ═══════════════════════════════════════════
+//  FORMS
+// ═══════════════════════════════════════════
+function renderForms(){
+  renderFG('partial-forms',PARTIAL_FIELDS,'part');
+  renderFG('manual-forms', MANUAL_FIELDS, 'manual');
+}
+
+function renderFG(cid,fields,type){
+  const bc=type==='part'?'var(--amber)':'var(--gray2)';
+  document.getElementById(cid).innerHTML=fields.map(f=>{
+    const saved=manualData[f.code];
+    return `<div class="form-card" style="border-top:3px solid ${bc}">
+      <div class="form-card-hdr">
+        <span style="font-size:18px">${f.icon}</span>
+        <h3>${fTitle(f)}</h3>
+        <span class="code-pill">${f.code}</span>
+        ${saved?`<span class="sensor-status status-ok" style="font-size:10px">✓</span>`:''}
+      </div>
+      <div class="form-card-body">
+        ${f.fields.map(field=>renderField(field,f.code,saved)).join('')}
+        <button class="save-btn" onclick="saveForm('${f.code}',this)">${t('saveBtn')}</button>
+        <div class="saved-indicator ${saved?'show':''}" id="si-${f.code}">
+          ✓ ${t('savedMsg')} — ${saved?.savedAt||''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderField(field,code,saved){
+  const val=saved?.[field.name]||'';
+  const ph=fPh(field);
+  if(field.type==='select'){
+    const opts=fOpts(field).map(o=>`<option ${val===o||(!val&&fOpts(field).indexOf(o)===0)?'':''}>${o}</option>`).join('');
+    return `<div class="field-row"><label>${fLabel(field)}</label><select name="${field.name}">${opts}</select></div>`;
+  }
+  if(field.type==='textarea'){
+    return `<div class="field-row"><label>${fLabel(field)}</label><textarea name="${field.name}" placeholder="${ph}">${val}</textarea></div>`;
+  }
+  return `<div class="field-row"><label>${fLabel(field)}</label><input type="${field.type}" name="${field.name}" value="${val}" placeholder="${ph}"></div>`;
+}
+
+function saveForm(code,btn){
+  const card=btn.closest('.form-card');
+  const data={savedAt:new Date().toLocaleString(lang==='ar'?'ar-SA':'en-GB')};
+  card.querySelectorAll('input,select,textarea').forEach(i=>{if(i.name)data[i.name]=i.value;});
+  manualData[code]=data;
+  const si=document.getElementById('si-'+code);
+  if(si){si.textContent=`✓ ${t('savedMsg')} — ${data.savedAt}`;si.classList.add('show');}
+  btn.textContent=t('saveDone'); btn.style.background='var(--teal2)';
+  setTimeout(()=>{btn.textContent=t('saveBtn');btn.style.background='';},2000);
+  const fname=[...PARTIAL_FIELDS,...MANUAL_FIELDS].find(f=>f.code===code);
+  eventLog.unshift({
+    time:new Date().toLocaleTimeString(lang==='ar'?'ar-SA':'en-GB',{hour:'2-digit',minute:'2-digit'}),
+    text:`${t('eventUpdated')} ${fname?fTitle(fname):code}`,
+    code,color:'#378ADD'
+  });
+  updateScores();
+  updateRegView();
+}
+
+// ═══════════════════════════════════════════
+//  REGULATORY VIEW
+// ═══════════════════════════════════════════
+function updateRegView(){
+  document.getElementById('event-list').innerHTML=
+    eventLog.slice(0,15).map(e=>`
+      <div class="event-row">
+        <div class="event-dot" style="background:${e.color}"></div>
+        <span class="event-time">${e.time}</span>
+        <span class="event-text">${e.text}</span>
+        <span class="event-code">${e.code}</span>
+      </div>`).join('')||`<div style="text-align:center;padding:20px;color:var(--text2);font-size:12px">${t('noEvents')}</div>`;
+
+  const allItems=[
+    ...SENSORS.map(s=>{const st=sensorSt(s);return{code:s.code,name:sName(s),type:'auto',
+      value:`${sensorValues[s.id]??s.base} ${s.unit}`,updatedAt:lang==='ar'?'لحظي':'Live',status:st};}),
+    ...PARTIAL_FIELDS.map(f=>{const sv=manualData[f.code];return{code:f.code,name:fTitle(f),type:'part',
+      value:sv?t('valEntered'):t('valPending'),updatedAt:sv?.savedAt||'—',status:sv?'ok':'warn'};}),
+    ...MANUAL_FIELDS.map(f=>{const sv=manualData[f.code];return{code:f.code,name:fTitle(f),type:'manual',
+      value:sv?t('valEntered'):t('valPending'),updatedAt:sv?.savedAt||'—',status:sv?'ok':'missing'};}),
+  ];
+
+  document.getElementById('reg-full-table').innerHTML=allItems.map(item=>{
+    const typeLbl=item.type==='auto'
+      ?`<span class="sensor-status status-ok" style="font-size:10px">${t('typeAuto')}</span>`
+      :item.type==='part'
+      ?`<span class="sensor-status status-warn" style="font-size:10px">${t('typePart')}</span>`
+      :`<span class="sensor-status" style="font-size:10px;background:var(--gray-lt);color:var(--gray)">${t('typeManual')}</span>`;
+    const stLbl=item.status==='ok'
+      ?`<span class="sensor-status status-ok">${t('regCompliant')}</span>`
+      :item.status==='warn'
+      ?`<span class="sensor-status status-warn">${t('regPartial')}</span>`
+      :item.status==='alert'
+      ?`<span class="sensor-status status-alert">${t('regViolation')}</span>`
+      :`<span class="sensor-status" style="background:var(--gray-lt);color:var(--gray)">${t('regIncomplete')}</span>`;
+    return `<tr>
+      <td><span class="code-pill">${item.code}</span></td>
+      <td>${item.name}</td><td>${typeLbl}</td>
+      <td style="font-family:'IBM Plex Mono',monospace;font-size:11px">${item.value}</td>
+      <td style="font-size:11px;color:var(--gray2)">${item.updatedAt}</td>
+      <td>${stLbl}</td></tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  TABS & CLOCK
+// ═══════════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='reg'){updateRegView();}
+  if(id==='auto'){setTimeout(drawTrend,50);}
+}
+
+function updateClock(){
+  document.getElementById('live-time').textContent=
+    new Date().toLocaleString(lang==='ar'?'ar-SA':'en-GB',
+      {weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+setLang('en');
+updateClock();
+setInterval(updateClock,1000);
+renderForms();
+updateSensors();
+setInterval(updateSensors,8000);
+eventLog=[{time:'00:00',text:T.en.sysStart,code:'SYS',color:'#1D9E75'}];
+window.addEventListener('resize',drawTrend);
+</script>
+</body>
+</html>
